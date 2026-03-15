@@ -22,9 +22,25 @@ const upload = multer({
 });
 
 // Google Drive API setup
-const GOOGLE_CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+let GOOGLE_CREDENTIALS;
+try {
+  if (typeof process.env.GOOGLE_CREDENTIALS === 'string') {
+    GOOGLE_CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+  } else {
+    GOOGLE_CREDENTIALS = process.env.GOOGLE_CREDENTIALS;
+  }
+} catch (error) {
+  console.error('Error parsing GOOGLE_CREDENTIALS:', error);
+  process.exit(1);
+}
+
 const GOOGLE_FOLDER_ID = process.env.GOOGLE_FOLDER_ID;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
+
+if (!GOOGLE_CREDENTIALS || !GOOGLE_FOLDER_ID) {
+  console.error('Missing required environment variables: GOOGLE_CREDENTIALS or GOOGLE_FOLDER_ID');
+  process.exit(1);
+}
 
 const auth = new google.auth.GoogleAuth({
   credentials: GOOGLE_CREDENTIALS,
