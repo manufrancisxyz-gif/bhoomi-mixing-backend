@@ -123,15 +123,15 @@ app.post('/api/submit', upload.single('file'), async (req, res) => {
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
-    const { email, serviceType, songName, artistName, bpm, notes } = req.body;
+    const { email, service, song_title, artist, bpm, notes } = req.body;
 
     // Validate required fields
-    if (!email || !serviceType || !songName || !artistName) {
+    if (!email || !service || !song_title || !artist) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     // Create folder name: "Artist - Song"
-    const folderName = `${artistName} - ${songName}`;
+    const folderName = `${artist} - ${song_title}`;
 
     // Create folder in Google Drive
     console.log(`Creating folder: ${folderName}`);
@@ -149,9 +149,9 @@ app.post('/api/submit', upload.single('file'), async (req, res) => {
     // Create metadata file
     const metadata = {
       email,
-      serviceType,
-      songName,
-      artistName,
+      serviceType: service,
+      songName: song_title,
+      artistName: artist,
       bpm: bpm || 'Not specified',
       notes: notes || 'None',
       submittedAt: new Date().toISOString()
