@@ -10,19 +10,8 @@ const path = require('path');
 const app = express();
 
 // Middleware
-const corsOptions = {
-  origin: [
-    'https://sparkling-tartufo-32a611.netlify.app',
-    'https://bhoomirecords.com',
-    'http://localhost:3000',
-    'http://localhost:5000'
-  ],
-  methods: ['GET', 'POST', 'OPTIONS'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
-
-app.use(cors(corsOptions));
+app.use(cors()); // Allow all origins
+app.options('*', cors()); // Handle preflight requests
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
