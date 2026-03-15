@@ -6,7 +6,6 @@ const cors = require('cors');
 require('dotenv').config();
 const fs = require('fs');
 const path = require('path');
-const AdmZip = require('adm-zip');
 
 const app = express();
 
