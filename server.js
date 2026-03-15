@@ -155,15 +155,24 @@ app.get('/api/health', (req, res) => {
 
 // Main submission endpoint
 app.post('/api/submit', upload.single('file'), async (req, res) => {
+  console.log('=== SUBMISSION RECEIVED ===');
+  console.log('Method:', req.method);
+  console.log('Body keys:', Object.keys(req.body));
+  console.log('File:', req.file ? req.file.originalname : 'NO FILE');
+  
   try {
     if (!req.file) {
+      console.log('✗ No file uploaded');
       return res.status(400).json({ error: 'No file uploaded' });
     }
 
     const { email, service, song_title, artist, bpm, notes } = req.body;
 
+    console.log('Form data:', { email, service, song_title, artist, bpm });
+
     // Validate required fields
     if (!email || !service || !song_title || !artist) {
+      console.log('✗ Missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
@@ -173,6 +182,7 @@ app.post('/api/submit', upload.single('file'), async (req, res) => {
     // Create folder in Google Drive
     console.log(`Creating folder: ${folderName}`);
     const folderId = await createFolder(folderName, GOOGLE_FOLDER_ID);
+    console.log(`✓ Folder created: ${folderId}`);
 
     // Upload ZIP file
     console.log(`Uploading file: ${req.file.originalname}`);
@@ -182,6 +192,7 @@ app.post('/api/submit', upload.single('file'), async (req, res) => {
       folderId,
       'application/zip'
     );
+    console.log(`✓ File uploaded`);
 
     // Create metadata file
     const metadata = {
