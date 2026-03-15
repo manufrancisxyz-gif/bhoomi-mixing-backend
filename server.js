@@ -23,24 +23,40 @@ const upload = multer({
 
 // Google Drive API setup
 let GOOGLE_CREDENTIALS;
+const credsString = process.env.GOOGLE_CREDENTIALS;
+
+console.log('Checking GOOGLE_CREDENTIALS...');
+console.log('Type:', typeof credsString);
+console.log('Length:', credsString ? credsString.length : 0);
+
 try {
-  if (typeof process.env.GOOGLE_CREDENTIALS === 'string') {
-    GOOGLE_CREDENTIALS = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+  if (credsString) {
+    // If it's already an object, use it directly
+    if (typeof credsString === 'object') {
+      GOOGLE_CREDENTIALS = credsString;
+    } else {
+      // Otherwise parse it as JSON string
+      GOOGLE_CREDENTIALS = JSON.parse(credsString);
+    }
+    console.log('✓ Credentials loaded successfully');
   } else {
-    GOOGLE_CREDENTIALS = process.env.GOOGLE_CREDENTIALS;
+    throw new Error('GOOGLE_CREDENTIALS is empty or undefined');
   }
 } catch (error) {
-  console.error('Error parsing GOOGLE_CREDENTIALS:', error);
+  console.error('✗ Failed to parse GOOGLE_CREDENTIALS:', error.message);
+  console.error('Raw value:', credsString?.substring(0, 100));
   process.exit(1);
 }
 
 const GOOGLE_FOLDER_ID = process.env.GOOGLE_FOLDER_ID;
 const NOTIFICATION_EMAIL = process.env.NOTIFICATION_EMAIL;
 
-if (!GOOGLE_CREDENTIALS || !GOOGLE_FOLDER_ID) {
-  console.error('Missing required environment variables: GOOGLE_CREDENTIALS or GOOGLE_FOLDER_ID');
+if (!GOOGLE_FOLDER_ID) {
+  console.error('✗ GOOGLE_FOLDER_ID is missing');
   process.exit(1);
 }
+
+console.log('✓ GOOGLE_FOLDER_ID:', GOOGLE_FOLDER_ID);
 
 const auth = new google.auth.GoogleAuth({
   credentials: GOOGLE_CREDENTIALS,
@@ -131,6 +147,11 @@ async function sendNotificationEmail(data, fileLink) {
     console.error('Error sending email:', error);
   }
 }
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Backend is running' });
+});
 
 // Main submission endpoint
 app.post('/api/submit', upload.single('file'), async (req, res) => {
