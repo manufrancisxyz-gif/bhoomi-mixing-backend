@@ -25,18 +25,18 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // Configure multer for file uploads
-// R2 supports files up to 5GB, but we'll keep 500MB for practical purposes
+// Cloudflare R2 supports files up to 5GB per file
 const storage = multer.memoryStorage();
 const upload = multer({ 
   storage: storage,
-  limits: { fileSize: 500 * 1024 * 1024 } // 500MB per file
+  limits: { fileSize: 5 * 1024 * 1024 * 1024 } // 5GB per file - R2 max
 });
 
 // Error handling for multer
 app.use((err, req, res, next) => {
   if (err instanceof multer.MulterError) {
     if (err.code === 'LIMIT_FILE_SIZE') {
-      return res.status(400).json({ error: 'File too large. Maximum size is 500MB.' });
+      return res.status(400).json({ error: 'File too large. Maximum size is 5GB.' });
     }
     if (err.code === 'LIMIT_FILE_COUNT') {
       return res.status(400).json({ error: 'Too many files uploaded.' });
