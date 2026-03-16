@@ -83,48 +83,20 @@ app.post('/api/submit', upload.single('file'), async (req, res) => {
       .from('mixing-submissions')
       .upload(filePath, req.file.buffer, {
         contentType: req.file.mimetype || 'application/zip',
-        upsert: false
+        upsert: true
       });
 
     if (error) {
-      console.error('Supabase upload error:', error);
+      console.error('✗ Supabase upload error:', JSON.stringify(error, null, 2));
       return res.status(500).json({ 
-        error: 'Failed to upload file',
-        details: error.message 
+        error: 'Failed to upload file to Supabase',
+        details: error.message,
+        status: error.status,
+        errorCode: error.errorCode
       });
     }
 
     console.log('✓ File uploaded successfully:', data.path);
-
-    // Create metadata file
-    const metadata = {
-      email,
-      serviceType: service,
-      songName: song_title,
-      artistName: artist,
-      bpm: bpm || 'Not specified',
-      notes: notes || 'None',
-      fileName: fileName,
-      fileSize: req.file.size,
-      submittedAt: new Date().toISOString()
-    };
-
-    const metadataPath = `${folderPath}/metadata.json`;
-    const metadataBuffer = Buffer.from(JSON.stringify(metadata, null, 2));
-
-    const { error: metadataError } = await supabase.storage
-      .from('mixing-submissions')
-      .upload(metadataPath, metadataBuffer, {
-        contentType: 'application/json',
-        upsert: true
-      });
-
-    if (metadataError) {
-      console.error('Metadata upload error:', metadataError);
-      // Don't fail if metadata fails, file is already uploaded
-    } else {
-      console.log('✓ Metadata saved');
-    }
 
     // Return success response with file info
     res.json({
@@ -141,10 +113,15 @@ app.post('/api/submit', upload.single('file'), async (req, res) => {
     console.log('✓ Response sent successfully');
 
   } catch (error) {
-    console.error('Error processing submission:', error);
+    console.error('✗ Error processing submission:', {
+      message: error.message,
+      stack: error.stack,
+      name: error.name
+    });
     res.status(500).json({ 
       error: 'Failed to process submission',
-      details: error.message 
+      details: error.message,
+      errorType: error.name
     });
   }
 });
