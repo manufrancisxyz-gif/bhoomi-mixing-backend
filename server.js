@@ -194,6 +194,11 @@ app.post('/api/test-admin-code', express.json(), (req, res) => {
   });
 });
 
+// Test: Simple ping endpoint
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'Backend is working!', timestamp: new Date() });
+});
+
 // Admin: Upload track for client delivery
 app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) => {
   try {
