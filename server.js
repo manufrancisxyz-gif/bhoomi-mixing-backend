@@ -180,13 +180,35 @@ function generateTrackId() {
   return 'track_' + Math.random().toString(36).substr(2, 9);
 }
 
+// Test endpoint to verify admin code
+app.post('/api/test-admin-code', express.json(), (req, res) => {
+  const { admin_code } = req.body;
+  const correct_code = process.env.ADMIN_CODE || 'not-set';
+  
+  res.json({
+    provided: admin_code,
+    expected: correct_code,
+    match: admin_code === correct_code,
+    env_admin_code: process.env.ADMIN_CODE,
+    env_set: !!process.env.ADMIN_CODE
+  });
+});
+
 // Admin: Upload track for client delivery
 app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) => {
   try {
     const { title, artist, download_code, admin_code } = req.body;
 
-    // Verify admin password
-    if (admin_code !== process.env.ADMIN_CODE || !admin_code) {
+    // Verify admin password with trimming and logging
+    const providedCode = String(admin_code || '').trim();
+    const expectedCode = String(process.env.ADMIN_CODE || '').trim();
+    
+    console.log('=== ADMIN CODE VALIDATION ===');
+    console.log('Provided:', providedCode);
+    console.log('Expected:', expectedCode);
+    console.log('Match:', providedCode === expectedCode);
+    
+    if (providedCode !== expectedCode || !providedCode) {
       return res.status(401).json({ error: 'Invalid admin code' });
     }
 
