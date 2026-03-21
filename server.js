@@ -25,15 +25,13 @@ const s3 = new AWS.S3({
 
 const bucket = process.env.R2_BUCKET_NAME || 'mixing-submissions';
 
-// In-memory storage for tracks and comments
+// In-memory storage
 const tracks = {};
 const comments = {};
 
 function generateTrackId() {
   return 'track_' + Math.random().toString(36).substr(2, 9);
 }
-
-// ============= ENDPOINTS =============
 
 // Health check
 app.get('/api/health', (req, res) => {
@@ -45,34 +43,23 @@ app.get('/api/test', (req, res) => {
   res.json({ message: 'Backend is working!', timestamp: new Date() });
 });
 
-// Form submission (artists)
+// Form submission
 app.post('/api/submit', upload.single('files'), async (req, res) => {
   try {
-    const { email, service, song_title, artist, bpm, notes } = req.body;
-
+    const { email, service, song_title, artist } = req.body;
     if (!email || !service || !song_title || !artist || !req.file) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-
     const folderPath = `${artist.replace(/\//g, '-')}/${song_title.replace(/\//g, '-')}`;
     const filePath = `${folderPath}/${req.file.originalname}`;
-
-    const params = {
+    await s3.upload({
       Bucket: bucket,
       Key: filePath,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
-    };
-
-    await s3.upload(params).promise();
-
-    res.json({
-      success: true,
-      message: 'Submission received',
-      file: filePath,
-    });
+    }).promise();
+    res.json({ success: true, message: 'Submission received', file: filePath });
   } catch (error) {
-    console.error('Error:', error);
     res.status(500).json({ error: 'Upload failed', details: error.message });
   }
 });
@@ -81,39 +68,24 @@ app.post('/api/submit', upload.single('files'), async (req, res) => {
 app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) => {
   try {
     const { title, artist, download_code, admin_code } = req.body;
-
-    // Validate admin code
     const expectedCode = String(process.env.ADMIN_CODE || '').trim();
     const providedCode = String(admin_code || '').trim();
-
-    console.log('Admin code validation:', {
-      provided: providedCode,
-      expected: expectedCode,
-      match: providedCode === expectedCode,
-    });
-
+    console.log('Admin code check:', { provided: providedCode, expected: expectedCode, match: providedCode === expectedCode });
     if (providedCode !== expectedCode) {
       return res.status(401).json({ error: 'Invalid admin code' });
     }
-
     if (!title || !artist || !download_code || !req.file) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
-
     const trackId = generateTrackId();
     const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.mp3`;
     const deliveryPath = `delivery/${trackId}/${fileName}`;
-
-    const params = {
+    await s3.upload({
       Bucket: bucket,
       Key: deliveryPath,
       Body: req.file.buffer,
       ContentType: req.file.mimetype,
-    };
-
-    await s3.upload(params).promise();
-
-    // Store track metadata
+    }).promise();
     tracks[trackId] = {
       id: trackId,
       title,
@@ -123,9 +95,7 @@ app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) 
       fileName,
       r2Path: deliveryPath,
     };
-
     comments[trackId] = [];
-
     res.json({
       success: true,
       trackId,
@@ -133,7 +103,7 @@ app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) 
       fullLink: `${process.env.FRONTEND_URL || 'https://bhoomirecords.com'}/listen/${trackId}`,
     });
   } catch (error) {
-    console.error('Error uploading delivery:', error);
+    console.error('Upload error:', error);
     res.status(500).json({ error: 'Upload failed', details: error.message });
   }
 });
@@ -141,31 +111,16 @@ app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) 
 // Get track info
 app.get('/api/tracks/:trackId', (req, res) => {
   const track = tracks[req.params.trackId];
-  if (!track) {
-    return res.status(404).json({ error: 'Track not found' });
-  }
-  res.json({
-    id: track.id,
-    title: track.title,
-    artist: track.artist,
-    uploadedAt: track.uploadedAt,
-  });
+  if (!track) return res.status(404).json({ error: 'Track not found' });
+  res.json({ id: track.id, title: track.title, artist: track.artist, uploadedAt: track.uploadedAt });
 });
 
 // Get track stream
 app.get('/api/tracks/:trackId/stream', async (req, res) => {
   try {
     const track = tracks[req.params.trackId];
-    if (!track) {
-      return res.status(404).json({ error: 'Track not found' });
-    }
-
-    const signedUrl = s3.getSignedUrl('getObject', {
-      Bucket: bucket,
-      Key: track.r2Path,
-      Expires: 3600,
-    });
-
+    if (!track) return res.status(404).json({ error: 'Track not found' });
+    const signedUrl = s3.getSignedUrl('getObject', { Bucket: bucket, Key: track.r2Path, Expires: 3600 });
     res.json({ url: signedUrl });
   } catch (error) {
     res.status(500).json({ error: 'Failed to get stream' });
@@ -181,23 +136,9 @@ app.get('/api/tracks/:trackId/comments', (req, res) => {
 // Post comment
 app.post('/api/tracks/:trackId/comments', express.json(), (req, res) => {
   const { author, text, timestamp } = req.body;
-
-  if (!author || !text) {
-    return res.status(400).json({ error: 'Missing author or text' });
-  }
-
-  if (!comments[req.params.trackId]) {
-    comments[req.params.trackId] = [];
-  }
-
-  const comment = {
-    id: Math.random().toString(36).substr(2, 9),
-    author,
-    text,
-    timestamp: timestamp || 0,
-    createdAt: new Date(),
-  };
-
+  if (!author || !text) return res.status(400).json({ error: 'Missing author or text' });
+  if (!comments[req.params.trackId]) comments[req.params.trackId] = [];
+  const comment = { id: Math.random().toString(36).substr(2, 9), author, text, timestamp: timestamp || 0, createdAt: new Date() };
   comments[req.params.trackId].push(comment);
   res.json({ success: true, comment });
 });
@@ -207,26 +148,10 @@ app.post('/api/tracks/:trackId/validate-download', express.json(), (req, res) =>
   try {
     const { download_code } = req.body;
     const track = tracks[req.params.trackId];
-
-    if (!track) {
-      return res.status(404).json({ error: 'Track not found' });
-    }
-
-    if (download_code !== track.download_code) {
-      return res.status(401).json({ error: 'Invalid download code' });
-    }
-
-    const signedUrl = s3.getSignedUrl('getObject', {
-      Bucket: bucket,
-      Key: track.r2Path,
-      Expires: 86400, // 24 hours
-    });
-
-    res.json({
-      success: true,
-      downloadUrl: signedUrl,
-      expiresIn: 86400,
-    });
+    if (!track) return res.status(404).json({ error: 'Track not found' });
+    if (download_code !== track.download_code) return res.status(401).json({ error: 'Invalid download code' });
+    const signedUrl = s3.getSignedUrl('getObject', { Bucket: bucket, Key: track.r2Path, Expires: 86400 });
+    res.json({ success: true, downloadUrl: signedUrl, expiresIn: 86400 });
   } catch (error) {
     res.status(500).json({ error: 'Failed to generate download link' });
   }
