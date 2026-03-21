@@ -171,9 +171,174 @@ File Name: ${fileName}
   }
 });
 
+// In-memory storage for tracks and comments (in production, use a database)
+const tracks = {}; // { trackId: { title, artist, code, uploadedAt, comments: [] } }
+const comments = {}; // { trackId: [{ author, text, timestamp, postedAt }] }
+
+// Generate unique track ID
+function generateTrackId() {
+  return 'track_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Admin: Upload track for client delivery
+app.post('/api/admin/upload-delivery', upload.single('files'), async (req, res) => {
+  try {
+    const { title, artist, download_code, admin_code } = req.body;
+
+    // Verify admin password
+    if (admin_code !== process.env.ADMIN_CODE || !admin_code) {
+      return res.status(401).json({ error: 'Invalid admin code' });
+    }
+
+    if (!title || !artist || !download_code || !req.file) {
+      return res.status(400).json({ error: 'Missing required fields: title, artist, download_code, file' });
+    }
+
+    const trackId = generateTrackId();
+    const fileName = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}_${Date.now()}.mp3`;
+    const deliveryPath = `delivery/${trackId}/${fileName}`;
+
+    // Upload to R2
+    const uploadParams = {
+      Bucket: 'mixing-submissions', // Use same bucket or create new one
+      Key: deliveryPath,
+      Body: req.file.buffer,
+      ContentType: req.file.mimetype || 'audio/mpeg',
+    };
+
+    await s3.upload(uploadParams).promise();
+    console.log('✓ Delivery track uploaded:', deliveryPath);
+
+    // Store track metadata in memory
+    tracks[trackId] = {
+      id: trackId,
+      title,
+      artist,
+      download_code,
+      uploadedAt: new Date(),
+      fileName,
+      r2Path: deliveryPath
+    };
+
+    comments[trackId] = [];
+
+    res.json({
+      success: true,
+      trackId,
+      shareLink: `/listen/${trackId}`,
+      fullLink: `${process.env.FRONTEND_URL || 'https://bhoomirecords.com'}/listen/${trackId}`
+    });
+
+  } catch (error) {
+    console.error('Error uploading delivery track:', error);
+    res.status(500).json({ error: 'Failed to upload track', details: error.message });
+  }
+});
+
+// Client: Get track info (without download code validation)
+app.get('/api/tracks/:trackId', (req, res) => {
+  const track = tracks[req.params.trackId];
+  if (!track) {
+    return res.status(404).json({ error: 'Track not found' });
+  }
+
+  res.json({
+    id: track.id,
+    title: track.title,
+    artist: track.artist,
+    uploadedAt: track.uploadedAt
+  });
+});
+
+// Client: Get track comments
+app.get('/api/tracks/:trackId/comments', (req, res) => {
+  const trackComments = comments[req.params.trackId] || [];
+  res.json({ comments: trackComments });
+});
+
+// Client: Stream audio file
+app.get('/api/tracks/:trackId/stream', async (req, res) => {
+  const track = tracks[req.params.trackId];
+  if (!track) {
+    return res.status(404).json({ error: 'Track not found' });
+  }
+
+  try {
+    // Generate presigned URL for streaming (valid for 1 hour)
+    const signedUrl = await s3.getSignedUrl('getObject', {
+      Bucket: 'mixing-submissions',
+      Key: track.r2Path,
+      Expires: 3600 // 1 hour for streaming
+    });
+
+    // Redirect to R2 signed URL for streaming
+    res.redirect(signedUrl);
+  } catch (error) {
+    console.error('Error streaming audio:', error);
+    res.status(500).json({ error: 'Failed to stream audio' });
+  }
+});
+
+// Client: Add comment with timestamp
+app.post('/api/tracks/:trackId/comments', express.json(), (req, res) => {
+  const { author, text, timestamp } = req.body;
+
+  if (!author || !text || timestamp === undefined) {
+    return res.status(400).json({ error: 'Missing required fields: author, text, timestamp' });
+  }
+
+  if (!comments[req.params.trackId]) {
+    return res.status(404).json({ error: 'Track not found' });
+  }
+
+  const comment = {
+    id: 'comment_' + Math.random().toString(36).substr(2, 9),
+    author,
+    text,
+    timestamp: parseFloat(timestamp),
+    postedAt: new Date()
+  };
+
+  comments[req.params.trackId].push(comment);
+  res.json({ success: true, comment });
+});
+
+// Client: Validate download code and get download URL
+app.post('/api/tracks/:trackId/validate-download', express.json(), async (req, res) => {
+  const { download_code } = req.body;
+  const track = tracks[req.params.trackId];
+
+  if (!track) {
+    return res.status(404).json({ error: 'Track not found' });
+  }
+
+  if (download_code !== track.download_code) {
+    return res.status(401).json({ error: 'Invalid download code' });
+  }
+
+  // Generate presigned URL for download (valid for 24 hours)
+  try {
+    const signedUrl = await s3.getSignedUrl('getObject', {
+      Bucket: 'mixing-submissions',
+      Key: track.r2Path,
+      Expires: 86400 // 24 hours
+    });
+
+    res.json({
+      success: true,
+      downloadUrl: signedUrl,
+      fileName: track.fileName
+    });
+  } catch (error) {
+    console.error('Error generating download URL:', error);
+    res.status(500).json({ error: 'Failed to generate download URL' });
+  }
+});
+
 // Start server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Bhoomi Mixing Backend running on port ${PORT}`);
   console.log(`Using Cloudflare R2 for file uploads`);
+  console.log(`Delivery system endpoints available`);
 });
