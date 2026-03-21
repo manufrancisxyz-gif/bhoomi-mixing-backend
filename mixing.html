@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Mixing - Bhoomi Records</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fragment Mono', 'Courier New', monospace;
+            background: #0a0e0b;
+            color: #e8e8e8;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0a0e0b;
+            padding: 20px 0;
+            border-bottom: 1px solid #2a3a2a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .logo-accent {
+            color: #CEF23C;
+        }
+
+        .nav {
+            display: flex;
+            gap: 30px;
+            align-items: center;
+        }
+
+        .nav a {
+            text-decoration: none;
+            color: #e8e8e8;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: #CEF23C;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin: 20px 0;
+            padding: 10px 20px;
+            background: #2a3a2a;
+            color: #CEF23C;
+            text-decoration: none;
+            font-size: 12px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .back-link:hover {
+            background: #3a4a3a;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        h1 {
+            font-family: 'Syne', sans-serif;
+            font-size: clamp(40px, 8vw, 56px);
+            font-weight: 800;
+            margin-bottom: 16px;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, #e8e8e8 0%, #CEF23C 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .subtitle {
+            font-size: 16px;
+            color: #999;
+            margin-bottom: 60px;
+            font-style: italic;
+            max-width: 600px;
+            line-height: 1.8;
+        }
+
+        .specs {
+            background: #0f1510;
+            border: 1px solid #2a3a2a;
+            padding: 30px;
+            margin-bottom: 40px;
+            border-radius: 4px;
+        }
+
+        .specs h3 {
+            font-family: 'Syne', sans-serif;
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: #CEF23C;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .specs-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            font-size: 13px;
+        }
+
+        .spec-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #2a3a2a;
+        }
+
+        .spec-item:last-child {
+            border-bottom: none;
+        }
+
+        .spec-label {
+            color: #999;
+            text-transform: uppercase;
+            font-size: 11px;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .spec-value {
+            color: #e8e8e8;
+            font-weight: bold;
+        }
+
+        form {
+            background: linear-gradient(135deg, #0f1510 0%, #0a0e0b 100%);
+            border: 1px solid #2a3a2a;
+            padding: 48px;
+            border-radius: 8px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+        }
+
+        .form-group {
+            margin-bottom: 32px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 12px;
+            color: #CEF23C;
+            font-weight: 600;
+        }
+
+        input[type="email"],
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: #0a0e0b;
+            border: 1px solid #2a3a2a;
+            color: #e8e8e8;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="email"]:focus,
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #CEF23C;
+            background: #0f1510;
+            box-shadow: 0 0 12px rgba(206, 242, 60, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: 'Fragment Mono', monospace;
+        }
+
+        .file-upload {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        .file-label {
+            display: block;
+            padding: 40px 20px;
+            background: #0a0e0b;
+            border: 2px dashed #2a3a2a;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            border-color: #CEF23C;
+            background: #0f1510;
+        }
+
+        .file-label.has-file {
+            border-color: #CEF23C;
+            background: #0f1510;
+        }
+
+        .file-label p {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #999;
+            margin: 0;
+        }
+
+        .file-name {
+            color: #CEF23C;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-row.full {
+            grid-template-columns: 1fr;
+        }
+
+        button {
+            background: linear-gradient(135deg, #CEF23C 0%, #b8e040 100%);
+            color: #0a0e0b;
+            padding: 16px 40px;
+            border: none;
+            font-family: 'Syne', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(206, 242, 60, 0.2);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #fff 0%, #CEF23C 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(206, 242, 60, 0.3);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success-message {
+            display: none;
+            background: #0f1510;
+            border: 1px solid #CEF23C;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .success-message h3 {
+            font-family: 'Syne', sans-serif;
+            color: #CEF23C;
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+
+        .progress-container {
+            display: none;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #0f1510;
+            border: 1px solid #2a3a2a;
+            border-radius: 6px;
+        }
+
+        .progress-container.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2a3a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #CEF23C;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+
+        .progress-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            font-size: 12px;
+        }
+
+        .progress-stat {
+            background: #0a0e0b;
+            padding: 10px;
+            border-radius: 4px;
+            border: 1px solid #2a3a2a;
+        }
+
+        .progress-stat-label {
+            color: #999;
+            text-transform: uppercase;
+            font-size: 10px;
+            letter-spacing: 0.5px;
+            margin-bottom: 5px;
+        }
+
+        .progress-stat-value {
+            color: #CEF23C;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">
+                <a href="/" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 20px;">
+                    <!-- Bhoomi Logo SVG -->
+                    <svg width="50" height="50" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" style="flex-shrink: 0;">
+                        <defs>
+                            <style>
+                                @keyframes spin-orbit {
+                                    from { transform: rotate(0deg); }
+                                    to { transform: rotate(360deg); }
+                                }
+                                @keyframes spin-petal {
+                                    from { transform: rotate(0deg); }
+                                    to { transform: rotate(-360deg); }
+                                }
+                                .orbit-ring {
+                                    animation: spin-orbit 25s linear infinite;
+                                    transform-origin: 50px 50px;
+                                }
+                                .petal-ring {
+                                    animation: spin-petal 35s linear infinite;
+                                    transform-origin: 50px 50px;
+                                }
+                            </style>
+                        </defs>
+                        <!-- Orbiting dots (outer ring) -->
+                        <g class="orbit-ring">
+                            <circle cx="50" cy="12" r="3.5" fill="#CEF23C" opacity="0.8"/>
+                            <circle cx="88" cy="50" r="3.5" fill="#CEF23C" opacity="0.8"/>
+                            <circle cx="50" cy="88" r="3.5" fill="#CEF23C" opacity="0.8"/>
+                            <circle cx="12" cy="50" r="3.5" fill="#CEF23C" opacity="0.8"/>
+                        </g>
+                        <!-- Center B -->
+                        <text x="50" y="58" font-family="'Syne', sans-serif" font-size="36" font-weight="800" fill="#CEF23C" text-anchor="middle" dominant-baseline="middle">B</text>
+                    </svg>
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; line-height: 1;">BHOOMI</div>
+                        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; line-height: 1;">RECORDS</div>
+                    </div>
+                </a>
+            </div>
+            <nav class="nav">
+                <a href="/">← Back to Label</a>
+            </nav>
+        </div>
+    </header>
+
+    <div class="container">
+        <a href="/" class="back-link">← Back to Bhoomi Records</a>
+
+        <h1>Submit for Mixing</h1>
+        <p class="subtitle">Your music deserves to be heard the way you intended.</p>
+
+        <div id="success-message" class="success-message">
+            <h3>Submission Received</h3>
+            <p>Your stems have been uploaded successfully. I'll review your project and get back to you soon.</p>
+        </div>
+
+        <form id="mixing-form">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="access-code">Access Code *</label>
+                    <input type="password" id="access-code" name="access_code" required>
+                    <div class="error-message" id="code-error" style="display: none;">Invalid access code</div>
+                </div>
+                <div class="form-group" style="visibility: hidden;">
+                    <label>&nbsp;</label>
+                    <input type="text" style="visibility: hidden;">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="email">Your Email *</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="service">Service Type *</label>
+                    <select id="service" name="service" required>
+                        <option value="">Select service</option>
+                        <option value="mixing">Mixing Only</option>
+                        <option value="mastering">Mastering Only</option>
+                        <option value="both">Mixing + Mastering</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="song-title">Song Title *</label>
+                    <input type="text" id="song-title" name="song_title" required>
+                </div>
+                <div class="form-group">
+                    <label for="artist">Artist / Project Name *</label>
+                    <input type="text" id="artist" name="artist" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="bpm">BPM (optional)</label>
+                    <input type="number" id="bpm" name="bpm" min="40" max="300">
+                </div>
+                <div class="form-group" style="visibility: hidden;">
+                    <label>&nbsp;</label>
+                    <input type="text" style="visibility: hidden;">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="notes">Special Instructions / Notes</label>
+                <textarea id="notes" name="notes"></textarea>
+            </div>
+
+            <div class="file-upload">
+                <label for="file" class="file-label" id="file-label">
+                    <p>Drag and drop your files or folder here</p>
+                    <p style="font-size: 11px; color: #999; margin-top: 10px;">ZIP files, folders, or individual audio files (Chrome/Firefox/Edge support folder upload)</p>
+
+                    <div class="file-name" id="file-name"></div>
+                </label>
+                <input type="file" id="file" name="file" accept=".zip,.mp3,.wav,.flac,.m4a,.aiff,.ogg" multiple required>
+            </div>
+
+            <div class="progress-container" id="progress-container">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <div class="progress-info">
+                    <div class="progress-stat">
+                        <div class="progress-stat-label">Progress</div>
+                        <div class="progress-stat-value" id="progress-percent">0%</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-stat-label">Speed</div>
+                        <div class="progress-stat-value" id="progress-speed">0 MB/s</div>
+                    </div>
+                    <div class="progress-stat">
+                        <div class="progress-stat-label">Time Remaining</div>
+                        <div class="progress-stat-value" id="progress-time">-- s</div>
+                    </div>
+                </div>
+                <button type="button" id="cancel-btn" style="margin-top: 15px; padding: 10px 20px; background: #ff4444; color: white; border: none; border-radius: 4px; cursor: pointer; font-family: 'Fragment Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 1px;">Cancel Upload</button>
+            </div>
+
+            <button type="submit" id="submit-btn">Submit Project</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('mixing-form');
+        const fileInput = document.getElementById('file');
+        const fileLabel = document.getElementById('file-label');
+        const fileName = document.getElementById('file-name');
+        const submitBtn = document.getElementById('submit-btn');
+        const successDiv = document.getElementById('success-message');
+
+        fileLabel.addEventListener('click', () => fileInput.click());
+
+        fileLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#CEF23C';
+            fileLabel.style.background = '#0f1510';
+        });
+
+        fileLabel.addEventListener('dragleave', () => {
+            fileLabel.style.borderColor = '#2a3a2a';
+            fileLabel.style.background = '#0a0e0b';
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#2a3a2a';
+            fileLabel.style.background = '#0a0e0b';
+            if (e.dataTransfer.files.length > 0) {
+                fileInput.files = e.dataTransfer.files;
+                updateFileName();
+            }
+        });
+
+        fileInput.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            if (fileInput.files.length > 0) {
+                const fileCount = fileInput.files.length;
+                let totalSize = 0;
+                
+                // Calculate total size
+                for (let i = 0; i < fileInput.files.length; i++) {
+                    const fileSize = fileInput.files[i].size;
+                    totalSize += fileSize;
+                }
+                
+                if (fileCount === 1) {
+                    fileName.textContent = fileInput.files[0].name + ' (' + (fileInput.files[0].size / 1024 / 1024).toFixed(2) + ' MB)';
+                } else {
+                    fileName.textContent = `${fileCount} files selected (${(totalSize / 1024 / 1024).toFixed(2)} MB total)`;
+                }
+                fileLabel.classList.add('has-file');
+                submitBtn.disabled = false;
+            } else {
+                fileName.textContent = '';
+                fileName.innerHTML = '';
+                fileLabel.classList.remove('has-file');
+                submitBtn.disabled = true;
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate access code
+            const accessCode = document.getElementById('access-code').value;
+            const codeError = document.getElementById('code-error');
+            const VALID_CODE = 'bhoomi1618'; // Change this to your desired access code
+            
+            if (accessCode !== VALID_CODE) {
+                codeError.style.display = 'block';
+                document.getElementById('access-code').style.borderColor = '#ff6b6b';
+                return;
+            }
+            
+            codeError.style.display = 'none';
+            document.getElementById('access-code').style.borderColor = '#2a3a2a';
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            const formData = new FormData();
+            const email = document.getElementById('email').value;
+            const service = document.getElementById('service').value;
+            const songTitle = document.getElementById('song-title').value;
+            const artist = document.getElementById('artist').value;
+            const bpm = document.getElementById('bpm').value;
+            const notes = document.getElementById('notes').value;
+
+            // Add all selected files (supports multiple files and folders)
+            for (let i = 0; i < fileInput.files.length; i++) {
+                formData.append('files', fileInput.files[i]);
+            }
+
+            formData.append('email', email);
+            formData.append('service', service);
+            formData.append('song_title', songTitle);
+            formData.append('artist', artist);
+            formData.append('bpm', bpm);
+            formData.append('notes', notes);
+
+            try {
+                // Show progress container
+                const progressContainer = document.getElementById('progress-container');
+                progressContainer.classList.add('show');
+
+                // Track upload with XMLHttpRequest for progress events
+                const xhr = new XMLHttpRequest();
+                
+                // Store xhr globally so cancel button can access it
+                window.currentXhr = xhr;
+
+                // Progress event
+                let startTime = Date.now();
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percentComplete = (e.loaded / e.total) * 100;
+                        const elapsed = (Date.now() - startTime) / 1000; // seconds
+                        const uploadedMB = e.loaded / (1024 * 1024);
+                        const speed = uploadedMB / elapsed; // MB/s
+
+                        // Calculate time remaining
+                        const totalMB = e.total / (1024 * 1024);
+                        const remainingMB = totalMB - uploadedMB;
+                        const timeRemaining = remainingMB / speed; // seconds
+
+                        // Update UI
+                        document.getElementById('progress-fill').style.width = percentComplete + '%';
+                        document.getElementById('progress-percent').textContent = Math.round(percentComplete) + '%';
+                        document.getElementById('progress-speed').textContent = speed.toFixed(2) + ' MB/s';
+                        document.getElementById('progress-time').textContent = Math.round(timeRemaining) + ' s';
+                    }
+                });
+
+                // Load event
+                xhr.addEventListener('load', () => {
+                    window.currentXhr = null;
+                    if (xhr.status === 200) {
+                        const result = JSON.parse(xhr.responseText);
+                        if (result.success) {
+                            successDiv.classList.add('show');
+                            form.reset();
+                            fileLabel.classList.remove('has-file');
+                            fileName.textContent = '';
+                            progressContainer.classList.remove('show');
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Submit Project';
+                            window.scrollTo(0, 0);
+                        } else {
+                            alert('Error submitting form: ' + (result.error || 'Unknown error'));
+                            submitBtn.disabled = false;
+                            submitBtn.textContent = 'Submit Project';
+                            progressContainer.classList.remove('show');
+                        }
+                    } else {
+                        alert('Error: Server returned status ' + xhr.status);
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Submit Project';
+                        progressContainer.classList.remove('show');
+                    }
+                });
+
+                // Error event
+                xhr.addEventListener('error', () => {
+                    window.currentXhr = null;
+                    alert('Error uploading file');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Project';
+                    progressContainer.classList.remove('show');
+                });
+
+                // Abort event (when user clicks cancel)
+                xhr.addEventListener('abort', () => {
+                    window.currentXhr = null;
+                    alert('Upload cancelled');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Submit Project';
+                    progressContainer.classList.remove('show');
+                });
+
+                // Send request to Railway backend
+                xhr.open('POST', 'https://bhoomi-mixing-backend-production.up.railway.app/api/submit');
+                xhr.send(formData);
+
+            } catch (error) {
+                alert('Error uploading file: ' + error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Submit Project';
+            }
+        });
+
+        // Cancel button functionality
+        const cancelBtn = document.getElementById('cancel-btn');
+        cancelBtn.addEventListener('click', () => {
+            if (window.currentXhr) {
+                window.currentXhr.abort();
+            }
+        });
+    </script>
+</body>
+</html>

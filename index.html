@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Bhoomi Records</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&family=Fragment+Mono:ital@0;1&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#080e08;--deep:#0c140c;--forest:#111f11;--pine:#1a2e1a;
+  --moss:#243d24;--olive:#3a5c2e;--sage:#5a7a42;--fern:#7aaa58;
+  --acid:#cef23c;--teal:#2a4a3e;--sea:#3a6a58;--mist:#8aaa94;
+  --cream:#eeecd8;--parch:#d8d4b8;
+}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--cream);font-family:'Fragment Mono',monospace;overflow-x:hidden}
+body::after{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='256' height='256' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");pointer-events:none;z-index:9999;opacity:.55;mix-blend-mode:overlay}
+
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes spin-rev{from{transform:rotate(0deg)}to{transform:rotate(-360deg)}}
+@keyframes pulse-acid{0%,100%{filter:drop-shadow(0 0 6px rgba(206,242,60,.3))}50%{filter:drop-shadow(0 0 20px rgba(206,242,60,.6))}}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes glow{0%,100%{opacity:.5}50%{opacity:1}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 56px;background:rgba(8,14,8,.88);backdrop-filter:blur(12px);border-bottom:1px solid rgba(36,61,36,.4)}
+.nav-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;letter-spacing:-.01em;color:var(--acid);text-decoration:none}
+.nav-links{display:flex;gap:36px;list-style:none}
+.nav-links a{font-family:'Fragment Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;color:var(--mist);text-decoration:none;transition:color .25s}
+.nav-links a:hover{color:var(--acid)}
+.nav-cta{font-family:'Fragment Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--void);background:var(--acid);padding:10px 22px;text-decoration:none;transition:background .2s}
+.nav-cta:hover{background:#b8e040}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;overflow:hidden;background:var(--deep);padding:120px 56px 80px}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 50%,transparent 30%,rgba(8,14,8,.85) 100%);pointer-events:none;z-index:1}
+.hero-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none}
+.hero-rings svg{width:85vmin;height:85vmin;opacity:.09;animation:spin-slow 90s linear infinite}
+.hero-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(206,242,60,.06),transparent 65%);pointer-events:none}
+.hero-inner{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center}
+.hero-logo{animation:float 7s ease-in-out infinite;margin-bottom:20px}
+.hero-logo svg{width:200px;height:200px;animation:pulse-acid 5s ease-in-out infinite}
+.hero-eyebrow{font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.45em;text-transform:uppercase;color:var(--fern);margin-bottom:16px;animation:fadeUp .8s .3s both}
+.hero-title{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(52px,10vw,108px);letter-spacing:-.03em;line-height:.9;color:var(--cream);animation:fadeUp .9s .4s both}
+.hero-title .ac{color:var(--acid)}
+.hero-sub{font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(14px,1.8vw,20px);color:var(--mist);margin-top:16px;animation:fadeUp .9s .6s both}
+.hero-btns{display:flex;gap:14px;margin-top:44px;animation:fadeUp .9s .8s both}
+.btn-prim{font-family:'Fragment Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;background:var(--acid);color:var(--void);padding:14px 28px;text-decoration:none;transition:background .2s}
+.btn-prim:hover{background:#b8e040}
+.btn-sec{font-family:'Fragment Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;border:1px solid var(--moss);color:var(--mist);padding:14px 28px;text-decoration:none;transition:border-color .2s,color .2s}
+.btn-sec:hover{border-color:var(--acid);color:var(--acid)}
+.scroll-hint{position:absolute;bottom:36px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;z-index:2;animation:fadeUp .9s 1.2s both}
+.scroll-hint span{font-family:'Fragment Mono',monospace;font-size:8px;letter-spacing:.35em;text-transform:uppercase;color:var(--moss)}
+.scroll-line{width:1px;height:36px;background:linear-gradient(to bottom,var(--moss),transparent);animation:glow 2s ease-in-out infinite}
+
+/* TICKER */
+.ticker{overflow:hidden;background:var(--pine);border-top:1px solid var(--moss);border-bottom:1px solid var(--moss);padding:10px 0;font-family:'Fragment Mono',monospace;font-size:10px;letter-spacing:.25em;text-transform:uppercase;color:var(--fern)}
+.ticker-inner{display:flex;white-space:nowrap;animation:marquee 30s linear infinite}
+.ticker-inner span{padding:0 28px}
+.tk{color:var(--acid);margin:0 2px}
+
+/* SECTIONS */
+section{padding:100px 72px;position:relative}
+.eyebrow{font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.45em;text-transform:uppercase;color:var(--acid);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.eyebrow::before{content:'';width:20px;height:1px;background:var(--acid)}
+h2.sh{font-family:'Syne',sans-serif;font-weight:700;font-size:clamp(30px,4vw,52px);color:var(--cream);line-height:1.05;margin-bottom:56px}
+h2.sh em{font-family:'DM Serif Display',serif;font-style:italic;color:var(--acid);font-weight:400}
+.wave{overflow:hidden;line-height:0}
+.wave svg{display:block;width:100%}
+.r{opacity:0;transform:translateY(22px);transition:opacity .8s ease,transform .8s ease}
+.r.on{opacity:1;transform:translateY(0)}
+
+/* ARTISTS */
+#artists{background:var(--deep)}
+.artists-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:3px}
+.artist-card{background:var(--forest);position:relative;overflow:hidden;transition:transform .4s cubic-bezier(.23,1,.32,1)}
+.artist-card:hover{transform:translateY(-4px)}
+.artist-card-top{height:280px;background:var(--pine);position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.artist-visual{width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative}
+.av-rings{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;opacity:.2}
+.av-rings svg{width:100%;height:100%}
+.av-initials{font-family:'Syne',sans-serif;font-weight:800;font-size:72px;color:var(--acid);position:relative;z-index:1;letter-spacing:-.03em;text-shadow:0 0 40px rgba(206,242,60,.3)}
+.ac-moss .artist-card-top{background:var(--moss)}
+.ac-teal .artist-card-top{background:var(--teal)}
+.artist-card-body{padding:28px 28px 32px}
+.artist-tag{font-family:'Fragment Mono',monospace;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--acid);margin-bottom:10px;display:inline-block;border:1px solid rgba(206,242,60,.3);padding:3px 10px}
+.artist-name{font-family:'Syne',sans-serif;font-weight:800;font-size:26px;color:var(--cream);letter-spacing:-.01em;margin-bottom:10px}
+.artist-desc{font-family:'Fragment Mono',monospace;font-size:11px;color:var(--mist);line-height:1.9;margin-bottom:20px}
+.artist-tracks{display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--moss);padding-top:16px}
+.track-row{display:flex;justify-content:space-between;align-items:center;font-family:'Fragment Mono',monospace;font-size:10px;color:var(--mist);padding:3px 0;transition:color .2s}
+.track-row:hover{color:var(--acid)}
+.track-num{color:var(--moss);margin-right:10px}
+.track-name{flex:1}
+.track-spot{font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--olive);text-decoration:none;border:1px solid var(--moss);padding:2px 8px;transition:color .2s,border-color .2s}
+.track-spot:hover{color:var(--acid);border-color:var(--acid)}
+.artist-link{display:inline-block;margin-top:18px;font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--void);background:var(--acid);padding:10px 20px;text-decoration:none;transition:background .2s}
+.artist-link:hover{background:#b8e040}
+
+/* RELEASES */
+#releases{background:var(--deep)}
+.releases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:3px}
+.release-card{background:var(--forest);transition:transform .35s;overflow:hidden}
+.release-card:hover{transform:translateY(-3px)}
+.release-art{height:180px;display:flex;align-items:center;justify-content:center;font-family:'Syne',sans-serif;font-weight:800;font-size:42px;color:var(--acid);letter-spacing:-.02em}
+.release-body{padding:18px 20px 22px}
+.release-artist{font-family:'Fragment Mono',monospace;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--acid);margin-bottom:6px}
+.release-title{font-family:'Syne',sans-serif;font-weight:700;font-size:16px;color:var(--cream);letter-spacing:-.01em;margin-bottom:4px}
+.release-meta{font-family:'Fragment Mono',monospace;font-size:9px;color:var(--moss);letter-spacing:.1em}
+
+/* ABOUT */
+#about{background:var(--forest);display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.about-text p{font-family:'Fragment Mono',monospace;font-size:12px;color:var(--mist);line-height:2.1;margin-bottom:18px}
+.about-text p strong{color:var(--acid);font-weight:400}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:3px}
+.stat-box{padding:28px 24px;background:var(--pine);border-top:2px solid var(--acid)}
+.stat-num{font-family:'Syne',sans-serif;font-weight:800;font-size:36px;color:var(--acid);letter-spacing:-.02em;margin-bottom:6px}
+.stat-label{font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--mist)}
+
+/* CONTACT */
+#contact{background:var(--deep);display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:start}
+.contact-intro p{font-family:'Fragment Mono',monospace;font-size:12px;color:var(--mist);line-height:2.1;margin-bottom:14px}
+.contact-detail{display:flex;flex-direction:column;gap:3px;margin-top:32px}
+.cd-row{display:flex;align-items:baseline;gap:16px;padding:16px 20px;background:var(--pine);border-left:2px solid var(--moss)}
+.cd-label{font-family:'Fragment Mono',monospace;font-size:8px;letter-spacing:.3em;text-transform:uppercase;color:var(--acid);min-width:80px}
+.cd-val{font-family:'Fragment Mono',monospace;font-size:11px;color:var(--cream)}
+.contact-form{display:flex;flex-direction:column;gap:3px}
+.form-group{display:flex;flex-direction:column;gap:4px}
+.form-group label{font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.3em;text-transform:uppercase;color:var(--acid)}
+.form-group input,.form-group select,.form-group textarea{background:var(--pine);border:1px solid var(--moss);color:var(--cream);font-family:'Fragment Mono',monospace;font-size:11px;padding:14px 16px;outline:none;transition:border-color .2s;resize:none;-webkit-appearance:none}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--acid)}
+.form-group select option{background:var(--pine)}
+.form-submit{font-family:'Fragment Mono',monospace;font-size:10px;letter-spacing:.3em;text-transform:uppercase;background:var(--acid);color:var(--void);border:none;padding:16px;cursor:pointer;margin-top:8px;transition:background .2s}
+.form-submit:hover{background:#b8e040}
+
+/* FOOTER */
+footer{padding:48px 72px;background:var(--void);border-top:1px solid var(--pine);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:16px}
+.footer-brand{font-family:'Syne',sans-serif;font-weight:800;font-size:18px;color:var(--acid);letter-spacing:-.01em}
+.footer-tagline{font-family:'DM Serif Display',serif;font-style:italic;font-size:13px;color:var(--moss);margin-top:4px}
+.footer-links{display:flex;gap:28px;list-style:none}
+.footer-links a{font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.25em;text-transform:uppercase;color:var(--moss);text-decoration:none;transition:color .2s}
+.footer-links a:hover{color:var(--acid)}
+.footer-copy{font-family:'Fragment Mono',monospace;font-size:9px;letter-spacing:.15em;color:var(--moss);text-transform:uppercase;width:100%;text-align:right;margin-top:8px}
+
+@media(max-width:900px){
+  nav{padding:18px 28px}
+  .nav-links{display:none}
+  section{padding:64px 28px}
+  #about,#contact{grid-template-columns:1fr;gap:44px}
+  footer{padding:36px 28px}
+  .footer-copy{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-brand" href="#hero">BHOOMI</a>
+  <ul class="nav-links">
+    <li><a href="#artists">Artists</a></li>
+    <li><a href="#releases">Releases</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <a class="nav-cta" href="/mixing">Order Mixing</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero" class="hero">
+  <div class="hero-rings">
+    <svg viewBox="0 0 500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="250" cy="250" r="240" stroke="#3a5c2e" stroke-width=".5"/>
+      <circle cx="250" cy="250" r="200" stroke="#3a5c2e" stroke-width=".5"/>
+      <circle cx="250" cy="250" r="160" stroke="#3a5c2e" stroke-width=".5"/>
+      <circle cx="250" cy="250" r="120" stroke="#5a7a42" stroke-width=".5"/>
+      <circle cx="250" cy="250" r="80"  stroke="#5a7a42" stroke-width=".5"/>
+    </svg>
+  </div>
+  <div class="hero-glow"></div>
+  <div class="hero-inner">
+    <div class="hero-logo">
+      <svg viewBox="0 0 240 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="hg" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#cef23c" stop-opacity=".15"/><stop offset="100%" stop-color="#cef23c" stop-opacity="0"/></radialGradient></defs>
+        <circle cx="120" cy="120" r="118" fill="url(#hg)"/>
+        <circle cx="120" cy="120" r="112" stroke="#3a5c2e" stroke-width="1" stroke-dasharray="4 8" opacity=".7"/>
+        <g style="transform-origin:120px 120px;animation:spin-slow 60s linear infinite">
+          <circle cx="120" cy="10"  r="2"   fill="#7aaa58" opacity=".8"/>
+          <circle cx="218" cy="72"  r="2"   fill="#7aaa58" opacity=".8"/>
+          <circle cx="230" cy="132" r="1.5" fill="#5a7a42" opacity=".6"/>
+          <circle cx="96"  cy="228" r="2"   fill="#7aaa58" opacity=".8"/>
+          <circle cx="14"  cy="154" r="2"   fill="#7aaa58" opacity=".8"/>
+          <circle cx="35"  cy="46"  r="2"   fill="#7aaa58" opacity=".8"/>
+        </g>
+        <g style="transform-origin:120px 120px;animation:spin-rev 45s linear infinite">
+          <path d="M120,120 C130,90 150,75 160,88 C170,101 155,118 120,120Z" fill="none" stroke="#5a7a42" stroke-width="1.2" opacity=".55"/>
+          <path d="M120,120 C130,90 150,75 160,88 C170,101 155,118 120,120Z" fill="none" stroke="#5a7a42" stroke-width="1.2" opacity=".55" transform="rotate(60 120 120)"/>
+          <path d="M120,120 C130,90 150,75 160,88 C170,101 155,118 120,120Z" fill="none" stroke="#5a7a42" stroke-width="1.2" opacity=".55" transform="rotate(120 120 120)"/>
+          <path d="M120,120 C130,90 150,75 160,88 C170,101 155,118 120,120Z" fill="none" stroke="#5a7a42" stroke-width="1.2" opacity=".55" transform="rotate(180 120 120)"/>
+          <path d="M120,120 C130,90 150,75 160,88 C170,101 155,118 120,120Z" fill="none" stroke="#5a7a42" stroke-width="1.2" opacity=".55" transform="rotate(240 120 120)"/>
+          <path d="M120,120 C130,90 150,75 160,88 C170,101 155,118 120,120Z" fill="none" stroke="#5a7a42" stroke-width="1.2" opacity=".55" transform="rotate(300 120 120)"/>
+        </g>
+        <circle cx="120" cy="120" r="52" fill="#0c140c"/>
+        <circle cx="120" cy="120" r="51" stroke="#3a5c2e" stroke-width=".8" opacity=".8"/>
+        <text x="120" y="141" font-family="Syne,sans-serif" font-weight="800" font-size="54" fill="#cef23c" text-anchor="middle" style="filter:drop-shadow(0 0 10px rgba(206,242,60,0.5))">B</text>
+      </svg>
+    </div>
+    <p class="hero-eyebrow">An independent record label</p>
+    <h1 class="hero-title">BHOO<span class="ac">MI</span><br/>RECORDS</h1>
+    <p class="hero-sub">music that grew from the ground up.</p>
+    <div class="hero-btns">
+      <a href="#artists" class="btn-prim">Our Artists</a>
+      <a href="#contact" class="btn-sec">Get in Touch</a>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <span>BHOOMI RECORDS <span class="tk">✦</span></span>
+    <span>ROOTED IN SOUND <span class="tk">✦</span></span>
+    <span>ROOTED IN MUSIC <span class="tk">✦</span></span>
+    <span>MUSIC FROM THE EARTH UP <span class="tk">✦</span></span>
+    <span>BHOOMI RECORDS <span class="tk">✦</span></span>
+    <span>ROOTED IN SOUND <span class="tk">✦</span></span>
+    <span>ROOTED IN MUSIC <span class="tk">✦</span></span>
+    <span>MUSIC FROM THE EARTH UP <span class="tk">✦</span></span>
+  </div>
+</div>
+
+<!-- ARTISTS -->
+<section id="artists">
+  <div class="eyebrow r">Our Artists</div>
+  <h2 class="sh r">The voices of <em>Bhoomi.</em></h2>
+  <div class="artists-grid">
+
+    <!-- tsoj -->
+    <div class="artist-card r">
+      <div class="artist-card-top">
+        <div class="artist-visual">
+          <div class="av-rings">
+            <svg viewBox="0 0 280 280" fill="none">
+              <circle cx="140" cy="140" r="135" stroke="#3a5c2e" stroke-width=".8"/>
+              <circle cx="140" cy="140" r="100" stroke="#3a5c2e" stroke-width=".8"/>
+              <circle cx="140" cy="140" r="65"  stroke="#5a7a42" stroke-width=".8"/>
+            </svg>
+          </div>
+          <div class="av-initials" style="font-size:52px;">tsoj</div>
+        </div>
+      </div>
+      <div class="artist-card-body">
+        <div class="artist-tag">Featured Artist</div>
+        <div class="artist-name">tsoj</div>
+        <div class="artist-desc">The Sound of Joy. An explorer of genre boundaries, blending melody and rhythm into something that feels both ancient and alien. tsoj's music moves between the earthy and the ethereal.</div>
+        <div class="artist-tracks">
+          <div class="track-row"><span class="track-num">01</span><span class="track-name">It will be Born</span><a class="track-spot" href="https://open.spotify.com/album/5Ewq6ETvD4jmVnw9Sz4rvo" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">02</span><span class="track-name">Kalabog</span><a class="track-spot" href="https://open.spotify.com/album/30kWqxaTZpkrwm6IGhPKdF" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">03</span><span class="track-name">KARMA</span><a class="track-spot" href="https://open.spotify.com/album/3Zh9PVoaiSQV8ED35t73N4" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">04</span><span class="track-name">Sapthawarnangal</span><a class="track-spot" href="https://open.spotify.com/album/6rOwVxX9NofJ1gXD778jUj" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">05</span><span class="track-name">Playful God</span><a class="track-spot" href="https://open.spotify.com/album/6UfH4wppfmipjQJvvZuD6h" target="_blank">Spotify</a></div>
+        </div>
+        <a class="artist-link" href="https://open.spotify.com/artist/4TyWYvDIoU3pYVyLUehshp" target="_blank">Listen on Spotify</a>
+      </div>
+    </div>
+
+    <!-- JORJ. -->
+    <div class="artist-card ac-moss r">
+      <div class="artist-card-top">
+        <div class="artist-visual">
+          <div class="av-rings">
+            <svg viewBox="0 0 280 280" fill="none">
+              <circle cx="140" cy="140" r="135" stroke="#3a5c2e" stroke-width=".8"/>
+              <circle cx="140" cy="140" r="100" stroke="#3a5c2e" stroke-width=".8"/>
+              <circle cx="140" cy="140" r="65"  stroke="#5a7a42" stroke-width=".8"/>
+            </svg>
+          </div>
+          <div class="av-initials" style="font-size:40px;">JORJ.</div>
+        </div>
+      </div>
+      <div class="artist-card-body">
+        <div class="artist-tag">Bhoomi Records</div>
+        <div class="artist-name">JORJ.</div>
+        <div class="artist-desc">cheaper than therapy. JORJ. writes from the inside out — raw emotion wrapped in understated production. Every track lands somewhere between a late night and a long thought.</div>
+        <div class="artist-tracks">
+          <div class="track-row"><span class="track-num">01</span><span class="track-name">low point.</span><a class="track-spot" href="https://open.spotify.com/album/4sDFmS3Cn1EF7LEb5tJoyy" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">02</span><span class="track-name">what's your superpower?</span><a class="track-spot" href="https://open.spotify.com/album/5bVFLZ2ezZozC1zSJi6VyY" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">03</span><span class="track-name">deep for no reason.</span><a class="track-spot" href="https://open.spotify.com/album/0GvWejUCdr8zjUoo8A0GDB" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">04</span><span class="track-name">McLovin</span><a class="track-spot" href="https://open.spotify.com/album/65ejJUXwCAUHQP6Bk0mGsn" target="_blank">Spotify</a></div>
+          <div class="track-row"><span class="track-num">05</span><span class="track-name">mile end</span><a class="track-spot" href="https://open.spotify.com/album/6Cer9W8MFeCcYnIWVC9kRF" target="_blank">Spotify</a></div>
+        </div>
+        <a class="artist-link" href="https://open.spotify.com/artist/2itDiy3z59T67qlYGJSIiO" target="_blank">Listen on Spotify</a>
+      </div>
+    </div>
+
+    <!-- Placeholder 3 -->
+    <div class="artist-card ac-teal r">
+      <div class="artist-card-top">
+        <div class="artist-visual">
+          <div class="av-rings"><svg viewBox="0 0 280 280" fill="none"><circle cx="140" cy="140" r="130" stroke="#3a6a58" stroke-width=".8" opacity=".5"/><circle cx="140" cy="140" r="90" stroke="#3a6a58" stroke-width=".8" opacity=".4"/></svg></div>
+          <div class="av-initials" style="font-size:52px;opacity:.4;">?</div>
+        </div>
+      </div>
+      <div class="artist-card-body">
+        <div class="artist-tag" style="border-color:rgba(42,74,62,.6);color:var(--sea);">Coming Soon</div>
+        <div class="artist-name" style="color:var(--mist);">Artist TBA</div>
+        <div class="artist-desc">The label is listening. If the sound is right, the earth will know. More soon.</div>
+        <div class="artist-tracks" style="border-top-color:var(--teal);">
+          <div class="track-row" style="color:var(--moss);"><span class="track-num">--</span><span class="track-name" style="font-style:italic;">Unreleased</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<div class="wave" style="background:var(--deep);">
+  <svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,24 C180,48 360,0 540,24 C720,48 900,0 1080,24 C1260,48 1380,12 1440,24 L1440,48 L0,48Z" fill="#111f11"/></svg>
+</div>
+
+<!-- RELEASES -->
+<section id="releases" style="background:#111f11;">
+  <div class="eyebrow r">Catalogue</div>
+  <h2 class="sh r"><em>Recent</em> releases</h2>
+  <div class="releases-grid">
+    <div class="release-card r"><div class="release-art" style="background:linear-gradient(135deg,#1a2e1a,#2a4a3e);">IWB</div><div class="release-body"><div class="release-artist">tsoj</div><div class="release-title">It will be Born</div><div class="release-meta">Album &middot; 2024</div></div></div>
+    <div class="release-card r"><div class="release-art" style="background:linear-gradient(135deg,#243d24,#1a2e1a);">KAR</div><div class="release-body"><div class="release-artist">tsoj</div><div class="release-title">KARMA</div><div class="release-meta">Single &middot; 2024</div></div></div>
+    <div class="release-card r"><div class="release-art" style="background:linear-gradient(135deg,#111f11,#3a5c2e);">KAL</div><div class="release-body"><div class="release-artist">tsoj</div><div class="release-title">Kalabog</div><div class="release-meta">Single &middot; 2024</div></div></div>
+    <div class="release-card r"><div class="release-art" style="background:linear-gradient(135deg,#1a2e1a,#243d24);">SAP</div><div class="release-body"><div class="release-artist">tsoj</div><div class="release-title">Sapthawarnangal</div><div class="release-meta">Single &middot; 2024</div></div></div>
+    <div class="release-card r"><div class="release-art" style="background:linear-gradient(135deg,#2a4a3e,#111f11);">PG</div><div class="release-body"><div class="release-artist">tsoj</div><div class="release-title">Playful God</div><div class="release-meta">Single &middot; 2023</div></div></div>
+    <div class="release-card r" style="opacity:.4;"><div class="release-art" style="background:var(--pine);font-size:28px;color:var(--moss);">TBA</div><div class="release-body"><div class="release-artist" style="color:var(--moss);">Bhoomi Records</div><div class="release-title" style="color:var(--mist);">Next release</div><div class="release-meta">Coming soon</div></div></div>
+  </div>
+</section>
+
+<div class="wave" style="background:#111f11;">
+  <svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,16 C240,44 480,4 720,28 C960,48 1200,10 1440,32 L1440,48 L0,48Z" fill="#111f11"/></svg>
+</div>
+
+<!-- ABOUT -->
+<section id="about" style="background:var(--forest);">
+  <div>
+    <div class="eyebrow r">About</div>
+    <h2 class="sh r">Rooted in<br/><em>the music.</em></h2>
+    <div class="about-text r">
+      <p>Bhoomi — meaning <strong>earth</strong> in Sanskrit — is an independent record label built for artists who don't fit neatly into any box. We believe music grows best when it's given room to develop in the dark, unhurried, on its own terms.</p>
+      <p>We work with composers and performers who blend genres, cross languages, and refuse to make the obvious thing. Our artists range from <strong>ambient electronic</strong> to <strong>experimental folk</strong>, connected by a commitment to craft and a willingness to go somewhere unexpected.</p>
+      <p>We handle the legal, business, and creative sides so our artists can focus entirely on the work.</p>
+    </div>
+  </div>
+  <div class="stat-grid r">
+    <div class="stat-box"><div class="stat-num">2025</div><div class="stat-label">Est.</div></div>
+    <div class="stat-box"><div class="stat-num">IND</div><div class="stat-label">Independent</div></div>
+    <div class="stat-box"><div class="stat-num">100%</div><div class="stat-label">Artist first</div></div>
+    <div class="stat-box"><div class="stat-num">&#8734;</div><div class="stat-label">Genre fluid</div></div>
+  </div>
+</section>
+
+<div class="wave" style="background:var(--forest);">
+  <svg viewBox="0 0 1440 48" preserveAspectRatio="none"><path d="M0,30 C360,8 720,42 1080,18 C1260,6 1380,34 1440,22 L1440,48 L0,48Z" fill="#0c140c"/></svg>
+</div>
+
+<!-- MIXING -->
+
+
+<!-- CONTACT -->
+<section id="contact" style="background:var(--deep);">
+  <div>
+    <div class="eyebrow r">Contact</div>
+    <h2 class="sh r">Let's make<br/><em>something.</em></h2>
+    <div class="contact-intro r">
+      <p>If you're an artist looking for management, a composer seeking representation, or a brand interested in sync licensing — we want to hear from you.</p>
+      <p>Bhoomi is a small label with a long attention span. We take our time with everything.</p>
+    </div>
+    <div class="contact-detail r">
+      <div class="cd-row"><span class="cd-label">Email</span><span class="cd-val"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="afc7cac3c3c0efcdc7c0c0c0c2c6ddcaccc0ddcbdc81ccc0c2">[email&#160;protected]</a></span></div>
+      <div class="cd-row"><span class="cd-label">Spotify</span><span class="cd-val">Bhoomi Records</span></div>
+      <div class="cd-row"><span class="cd-label">Instagram</span><span class="cd-val">@bhooomirecords</span></div>
+    </div>
+  </div>
+  <div class="r">
+    <form class="contact-form" onsubmit="handleSubmit(event)">
+      <div class="form-group"><label>Your name</label><input type="text" placeholder="Full name" required/></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="your@email.com" required/></div>
+      <div class="form-group"><label>I am a</label><select><option value="">Select...</option><option>Artist / Composer</option><option>Manager / Label</option><option>Brand / Sync</option><option>Media / Press</option><option>Other</option></select></div>
+      <div class="form-group"><label>Message</label><textarea rows="5" placeholder="Tell us about yourself and what you're working on..." required></textarea></div>
+      <button type="submit" class="form-submit">Send Message</button>
+    </form>
+    <div id="form-success" style="display:none;padding:24px;background:var(--pine);border-left:2px solid var(--acid);margin-top:3px;">
+      <p style="font-family:'Fragment Mono',monospace;font-size:11px;color:var(--acid);line-height:1.9;">Message received. We'll be in touch.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-brand">BHOOMI</div>
+    <div class="footer-tagline">music that grew from the ground up.</div>
+  </div>
+  <ul class="footer-links">
+    <li><a href="#artists">Artists</a></li>
+    <li><a href="#releases">Releases</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="footer-copy">&#169; 2025 Bhoomi Records. All rights reserved.</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+const reveals = document.querySelectorAll('.r');
+const obs = new IntersectionObserver(entries => {
+  entries.forEach((e,i)=>{ if(e.isIntersecting){ setTimeout(()=>e.target.classList.add('on'),i*80); obs.unobserve(e.target); } });
+},{threshold:0.08});
+reveals.forEach(el=>obs.observe(el));
+
+function handleSubmit(event) {
+  event.preventDefault();
+  document.getElementById('form-success').style.display = 'block';
+  event.target.reset();
+}
+</script>
+function handleSubmit(e){ e.preventDefault(); e.target.style.display='none'; doc

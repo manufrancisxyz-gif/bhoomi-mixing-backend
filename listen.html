@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Track Review - Bhoomi Records</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/wavesurfer.js/7.7.10/wavesurfer.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fragment Mono', 'Courier New', monospace;
+            background: #0a0e0b;
+            color: #e8e8e8;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0a0e0b;
+            padding: 20px 0;
+            border-bottom: 1px solid #2a3a2a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .logo-accent {
+            color: #CEF23C;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .player-section {
+            background: linear-gradient(135deg, #0f1510 0%, #0a0e0b 100%);
+            border: 1px solid #2a3a2a;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        #waveform {
+            width: 100%;
+            height: 120px;
+            margin-bottom: 20px;
+            background: #0a0e0b;
+            border-radius: 4px;
+            border: 1px solid #2a3a2a;
+            cursor: pointer;
+        }
+
+        .waveform-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .play-btn {
+            background: linear-gradient(135deg, #CEF23C 0%, #b8e040 100%);
+            color: #0a0e0b;
+            padding: 12px 16px;
+            border: none;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            min-width: auto;
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+
+        .play-btn:hover {
+            background: linear-gradient(135deg, #fff 0%, #CEF23C 100%);
+            transform: translateY(-2px);
+        }
+
+        .play-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: #999;
+            flex: 1;
+            text-align: right;
+        }
+
+        .player-section {
+            background: linear-gradient(135deg, #0f1510 0%, #0a0e0b 100%);
+            border: 1px solid #2a3a2a;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .track-info {
+            margin-bottom: 24px;
+        }
+
+        .track-title {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            color: #e8e8e8;
+        }
+
+        .track-artist {
+            color: #999;
+            font-size: 13px;
+        }
+
+        audio {
+            width: 100%;
+            margin-bottom: 20px;
+            background: #0a0e0b;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .time-display {
+            font-size: 12px;
+            color: #999;
+            min-width: 100px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #CEF23C 0%, #b8e040 100%);
+            color: #0a0e0b;
+            padding: 12px 24px;
+            border: none;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #fff 0%, #CEF23C 100%);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error {
+            background: #1a0a0a;
+            border: 1px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 6px;
+            color: #ff6b6b;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .comments-section {
+            margin-top: 40px;
+        }
+
+        .comments-header {
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 20px;
+            color: #e8e8e8;
+        }
+
+        .comment-form {
+            background: #0f1510;
+            border: 1px solid #2a3a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+            color: #CEF23C;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 10px 12px;
+            background: #0a0e0b;
+            border: 1px solid #2a3a2a;
+            color: #e8e8e8;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 12px;
+            border-radius: 4px;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #CEF23C;
+            box-shadow: 0 0 8px rgba(206, 242, 60, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .timestamp-info {
+            font-size: 11px;
+            color: #999;
+            margin-top: 8px;
+        }
+
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .comment {
+            background: #0f1510;
+            border: 1px solid #2a3a2a;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            color: #CEF23C;
+            font-size: 12px;
+        }
+
+        .comment-timestamp {
+            color: #999;
+            font-size: 11px;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .comment-timestamp:hover {
+            color: #CEF23C;
+        }
+
+        .comment-text {
+            color: #e8e8e8;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .comment-time {
+            font-size: 10px;
+            color: #666;
+            margin-top: 8px;
+        }
+
+        .no-comments {
+            color: #999;
+            font-size: 12px;
+            padding: 20px;
+            text-align: center;
+            background: #0f1510;
+            border-radius: 6px;
+            border: 1px dashed #2a3a2a;
+        }
+
+        .download-section {
+            background: linear-gradient(135deg, #0f2010 0%, #0a0e0b 100%);
+            border: 1px solid #2a5a2a;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .download-section label {
+            color: #CEF23C;
+        }
+
+        .success-message {
+            background: #0f1510;
+            border: 1px solid #CEF23C;
+            padding: 16px;
+            border-radius: 6px;
+            color: #CEF23C;
+            font-size: 12px;
+            margin-top: 12px;
+            display: none;
+        }
+
+        .success-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: inline-block;
+            color: #999;
+            font-size: 12px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">BHOOMI <span class="logo-accent">RECORDS</span></div>
+            <a href="/" style="color: #999; text-decoration: none; font-size: 12px;">← Back</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="error" class="error"></div>
+
+        <div class="player-section">
+            <div class="track-info">
+                <div class="track-title" id="track-title">Loading...</div>
+                <div class="track-artist" id="track-artist"></div>
+            </div>
+
+            <div id="waveform"></div>
+
+            <div class="waveform-controls">
+                <button class="play-btn" id="play-btn" title="Play">
+                    <svg id="play-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg id="pause-icon" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg" style="display: none;">
+                        <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                    </svg>
+                </button>
+                <span class="time-display">
+                    <span id="current-time">0:00</span> / <span id="duration">0:00</span>
+                </span>
+                <button onclick="addCommentAtCurrentTime()" style="margin-left: auto; padding: 10px 16px; font-size: 10px;">Comment at Time</button>
+            </div>
+        </div>
+
+        <div class="download-section">
+            <h3 style="color: #e8e8e8; margin-bottom: 16px; font-size: 16px;">Download Track</h3>
+            <div class="form-group">
+                <label for="download-code">Download Code *</label>
+                <input type="password" id="download-code" required>
+            </div>
+            <button onclick="handleDownload()" style="width: 100%;">Get Download Link</button>
+            <div id="download-success" class="success-message"></div>
+            <div id="download-loading" class="loading" style="display: none;">Processing...</div>
+        </div>
+
+        <div class="comments-section">
+            <h2 class="comments-header">Feedback & Comments</h2>
+
+            <div class="comment-form">
+                <div class="form-group">
+                    <label for="author-name">Your Name *</label>
+                    <input type="text" id="author-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="comment-text">Comment *</label>
+                    <textarea id="comment-text" required></textarea>
+                    <div class="timestamp-info" id="timestamp-display">Timestamp: Not set (will comment on whole track)</div>
+                </div>
+                <button onclick="submitComment()" style="width: 100%;">Post Comment</button>
+            </div>
+
+            <div id="comments-list" class="comments-list"></div>
+        </div>
+    </div>
+
+    <script>
+        const trackId = new URLSearchParams(window.location.search).get('id') || window.location.pathname.split('/').pop();
+        const backendUrl = 'https://bhoomi-mixing-backend-production.up.railway.app';
+        let currentTimestamp = null;
+        let wavesurfer = null;
+
+        // Initialize wavesurfer
+        function initWavesurfer() {
+            wavesurfer = WaveSurfer.create({
+                container: '#waveform',
+                waveColor: '#CEF23C',
+                progressColor: '#b8e040',
+                cursorColor: '#e8e8e8',
+                barWidth: 3,
+                barHeight: 1,
+                barGap: 2,
+                height: 120,
+                normalize: true,
+                backend: 'WebAudio'
+            });
+
+            const playBtn = document.getElementById('play-btn');
+            playBtn.addEventListener('click', () => {
+                if (wavesurfer.isPlaying()) {
+                    wavesurfer.pause();
+                    document.getElementById('play-icon').style.display = 'block';
+                    document.getElementById('pause-icon').style.display = 'none';
+                } else {
+                    wavesurfer.play();
+                    document.getElementById('play-icon').style.display = 'none';
+                    document.getElementById('pause-icon').style.display = 'block';
+                }
+            });
+
+            wavesurfer.on('play', () => {
+                document.getElementById('play-icon').style.display = 'none';
+                document.getElementById('pause-icon').style.display = 'block';
+            });
+
+            wavesurfer.on('pause', () => {
+                document.getElementById('play-icon').style.display = 'block';
+                document.getElementById('pause-icon').style.display = 'none';
+            });
+
+            wavesurfer.on('timeupdate', (time) => {
+                document.getElementById('current-time').textContent = formatTime(time);
+            });
+
+            wavesurfer.on('ready', () => {
+                document.getElementById('duration').textContent = formatTime(wavesurfer.getDuration());
+            });
+
+            // Make waveform clickable for seeking
+            const waveformContainer = document.getElementById('waveform');
+            waveformContainer.addEventListener('click', (e) => {
+                const rect = waveformContainer.getBoundingClientRect();
+                const percent = (e.clientX - rect.left) / rect.width;
+                if (percent >= 0 && percent <= 1) {
+                    wavesurfer.seekTo(percent);
+                }
+            });
+        }
+
+        // Load track info and audio
+        async function loadTrack() {
+            try {
+                const res = await fetch(`${backendUrl}/api/tracks/${trackId}`);
+                if (!res.ok) throw new Error('Track not found');
+                const track = await res.json();
+
+                document.getElementById('track-title').textContent = track.title;
+                document.getElementById('track-artist').textContent = `by ${track.artist}`;
+                document.title = `${track.title} - Bhoomi Records`;
+
+                // Initialize wavesurfer
+                initWavesurfer();
+
+                // Try to load audio from multiple sources
+                // First try: Get from backend (if streaming endpoint exists)
+                const audioUrl = `${backendUrl}/api/tracks/${trackId}/stream`;
+                
+                try {
+                    // Test if stream endpoint exists
+                    const testRes = await fetch(audioUrl, { method: 'HEAD' });
+                    if (testRes.ok) {
+                        wavesurfer.load(audioUrl);
+                    } else {
+                        showError('Audio file not available for streaming');
+                    }
+                } catch (e) {
+                    showError('Could not load audio. Please try again.');
+                }
+
+                loadComments();
+            } catch (error) {
+                showError('Track not found. Please check the link.');
+            }
+        }
+
+        // Load comments
+        async function loadComments() {
+            try {
+                const res = await fetch(`${backendUrl}/api/tracks/${trackId}/comments`);
+                const data = await res.json();
+                const commentsList = document.getElementById('comments-list');
+
+                if (data.comments.length === 0) {
+                    commentsList.innerHTML = '<div class="no-comments">No comments yet. Be the first to share feedback!</div>';
+                } else {
+                    commentsList.innerHTML = data.comments.map(comment => `
+                        <div class="comment">
+                            <div class="comment-header">
+                                <span class="comment-author">${escapeHtml(comment.author)}</span>
+                                <span class="comment-timestamp" onclick="seekToTime(${comment.timestamp})">
+                                    ${formatTime(comment.timestamp)}
+                                </span>
+                            </div>
+                            <div class="comment-text">${escapeHtml(comment.text)}</div>
+                            <div class="comment-time">Posted: ${new Date(comment.postedAt).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                }
+            } catch (error) {
+                console.error('Error loading comments:', error);
+            }
+        }
+
+        // Add comment at current time
+        function addCommentAtCurrentTime() {
+            if (!wavesurfer) return;
+            currentTimestamp = wavesurfer.getCurrentTime() || 0;
+            document.getElementById('timestamp-display').textContent = `Timestamp: ${formatTime(currentTimestamp)}`;
+            document.getElementById('author-name').focus();
+        }
+
+        // Submit comment
+        async function submitComment() {
+            const author = document.getElementById('author-name').value.trim();
+            const text = document.getElementById('comment-text').value.trim();
+
+            if (!author || !text) {
+                showError('Please fill in all fields');
+                return;
+            }
+
+            try {
+                const res = await fetch(`${backendUrl}/api/tracks/${trackId}/comments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        author,
+                        text,
+                        timestamp: currentTimestamp || 0
+                    })
+                });
+
+                if (!res.ok) throw new Error('Failed to post comment');
+
+                document.getElementById('author-name').value = '';
+                document.getElementById('comment-text').value = '';
+                document.getElementById('timestamp-display').textContent = 'Timestamp: Not set (will comment on whole track)';
+                currentTimestamp = null;
+
+                loadComments();
+            } catch (error) {
+                showError(error.message);
+            }
+        }
+
+        // Handle download
+        async function handleDownload() {
+            const code = document.getElementById('download-code').value.trim();
+            if (!code) {
+                showError('Please enter download code');
+                return;
+            }
+
+            document.getElementById('download-loading').style.display = 'block';
+
+            try {
+                const res = await fetch(`${backendUrl}/api/tracks/${trackId}/validate-download`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ download_code: code })
+                });
+
+                if (!res.ok) {
+                    if (res.status === 401) {
+                        throw new Error('Invalid download code');
+                    }
+                    throw new Error('Failed to validate code');
+                }
+
+                const data = await res.json();
+                const successDiv = document.getElementById('download-success');
+                successDiv.innerHTML = `<a href="${data.downloadUrl}" download="${data.fileName}" style="color: #CEF23C; text-decoration: underline;">Click here to download</a>`;
+                successDiv.classList.add('show');
+                document.getElementById('download-code').value = '';
+
+            } catch (error) {
+                showError(error.message);
+            } finally {
+                document.getElementById('download-loading').style.display = 'none';
+            }
+        }
+
+        // Seek to time when clicking comment timestamp
+        function seekToTime(seconds) {
+            if (wavesurfer) {
+                wavesurfer.seekTo(seconds / wavesurfer.getDuration());
+                wavesurfer.play();
+            }
+        }
+
+        // Utility functions
+        function formatTime(seconds) {
+            const mins = Math.floor(seconds / 60);
+            const secs = Math.floor(seconds % 60);
+            return `${mins}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return text.replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('error');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+            setTimeout(() => errorDiv.classList.remove('show'), 5000);
+        }
+
+        // Load track on page load
+        loadTrack();
+    </script>
+</body>
+</html>
