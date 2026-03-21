@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Bhoomi Records</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Fragment Mono', 'Courier New', monospace;
+            background: #0a0e0b;
+            color: #e8e8e8;
+            line-height: 1.6;
+        }
+
+        header {
+            background: #0a0e0b;
+            padding: 20px 0;
+            border-bottom: 1px solid #2a3a2a;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        .logo-accent {
+            color: #CEF23C;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: #e8e8e8;
+        }
+
+        .subtitle {
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 40px;
+        }
+
+        .form-section {
+            background: linear-gradient(135deg, #0f1510 0%, #0a0e0b 100%);
+            border: 1px solid #2a3a2a;
+            padding: 40px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-bottom: 10px;
+            color: #CEF23C;
+            font-weight: 600;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="file"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: #0a0e0b;
+            border: 1px solid #2a3a2a;
+            color: #e8e8e8;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus,
+        input[type="password"]:focus,
+        input[type="file"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #CEF23C;
+            background: #0f1510;
+            box-shadow: 0 0 12px rgba(206, 242, 60, 0.2);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #CEF23C 0%, #b8e040 100%);
+            color: #0a0e0b;
+            padding: 14px 36px;
+            border: none;
+            font-family: 'Fragment Mono', monospace;
+            font-size: 12px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(206, 242, 60, 0.2);
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #fff 0%, #CEF23C 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 32px rgba(206, 242, 60, 0.3);
+        }
+
+        button:disabled {
+            background: #666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .success {
+            background: #0f1510;
+            border: 1px solid #CEF23C;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .success.show {
+            display: block;
+        }
+
+        .success h3 {
+            color: #CEF23C;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .copy-btn {
+            background: #2a3a2a;
+            color: #CEF23C;
+            padding: 8px 16px;
+            font-size: 11px;
+            margin-top: 10px;
+            box-shadow: none;
+        }
+
+        .copy-btn:hover {
+            background: #3a4a3a;
+        }
+
+        .code-display {
+            background: #0a0e0b;
+            border: 1px solid #2a3a2a;
+            padding: 16px;
+            border-radius: 4px;
+            margin-top: 10px;
+            word-break: break-all;
+            font-size: 13px;
+        }
+
+        .error {
+            background: #1a0a0a;
+            border: 1px solid #ff6b6b;
+            padding: 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            display: none;
+            color: #ff6b6b;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .file-label {
+            display: block;
+            padding: 30px 20px;
+            background: #0a0e0b;
+            border: 2px dashed #2a3a2a;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.3s;
+        }
+
+        .file-label:hover {
+            border-color: #CEF23C;
+            background: #0f1510;
+        }
+
+        .file-label p {
+            font-size: 12px;
+            color: #999;
+            margin: 0;
+        }
+
+        .file-name {
+            color: #CEF23C;
+            font-weight: bold;
+            margin-top: 10px;
+            display: none;
+        }
+
+        .file-name.show {
+            display: block;
+        }
+
+        .progress {
+            display: none;
+            margin-top: 20px;
+        }
+
+        .progress.show {
+            display: block;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2a3a2a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #CEF23C;
+            width: 0%;
+            transition: width 0.2s ease;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <div class="logo">BHOOMI <span class="logo-accent">RECORDS</span></div>
+            <a href="/" style="color: #999; text-decoration: none; font-size: 12px;">← Back</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <h1>Upload Track for Client</h1>
+        <p class="subtitle">Share your mixed/mastered track with clients for feedback.</p>
+
+        <div id="error" class="error"></div>
+        <div id="success" class="success">
+            <h3>Track Uploaded Successfully!</h3>
+            <p>Share this link with your client:</p>
+            <div class="code-display" id="share-link"></div>
+            <button class="copy-btn" onclick="copyToClipboard()">Copy Link</button>
+            <p style="margin-top: 20px; font-size: 12px;">Client download code: <strong id="download-code"></strong></p>
+        </div>
+
+        <form id="upload-form" class="form-section">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="title">Track Title *</label>
+                    <input type="text" id="title" name="title" required>
+                </div>
+                <div class="form-group">
+                    <label for="artist">Artist / Project Name *</label>
+                    <input type="text" id="artist" name="artist" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="download-code-input">Download Code *</label>
+                    <input type="password" id="download-code-input" name="download_code" required>
+                    <p style="font-size: 11px; color: #999; margin-top: 8px;">Clients will need this to download the track</p>
+                </div>
+                <div class="form-group">
+                    <label for="admin-code">Admin Code *</label>
+                    <input type="password" id="admin-code" name="admin_code" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="file">Audio File (MP3, WAV, etc.) *</label>
+                <label for="file" class="file-label" id="file-label">
+                    <p>Drag and drop your audio file or click to select</p>
+                    <div class="file-name" id="file-name"></div>
+                </label>
+                <input type="file" id="file" name="file" accept="audio/*" required style="display: none;">
+            </div>
+
+            <div class="progress" id="progress">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progress-fill"></div>
+                </div>
+                <p style="font-size: 12px;">Uploading... <span id="progress-percent">0%</span></p>
+            </div>
+
+            <button type="submit" id="submit-btn">Upload Track</button>
+        </form>
+    </div>
+
+    <script>
+        const form = document.getElementById('upload-form');
+        const fileInput = document.getElementById('file');
+        const fileLabel = document.getElementById('file-label');
+        const fileName = document.getElementById('file-name');
+        const submitBtn = document.getElementById('submit-btn');
+        const errorDiv = document.getElementById('error');
+        const successDiv = document.getElementById('success');
+
+        // File upload handling
+        fileLabel.addEventListener('click', () => fileInput.click());
+
+        fileLabel.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#CEF23C';
+        });
+
+        fileLabel.addEventListener('dragleave', () => {
+            fileLabel.style.borderColor = '#2a3a2a';
+        });
+
+        fileLabel.addEventListener('drop', (e) => {
+            e.preventDefault();
+            fileLabel.style.borderColor = '#2a3a2a';
+            fileInput.files = e.dataTransfer.files;
+            updateFileName();
+        });
+
+        fileInput.addEventListener('change', updateFileName);
+
+        function updateFileName() {
+            if (fileInput.files.length > 0) {
+                const size = (fileInput.files[0].size / (1024 * 1024)).toFixed(2);
+                fileName.textContent = `${fileInput.files[0].name} (${size} MB)`;
+                fileName.classList.add('show');
+                fileLabel.style.borderColor = '#CEF23C';
+            }
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            console.log('Form submitted!');
+            errorDiv.classList.remove('show');
+            successDiv.classList.remove('show');
+
+            const title = document.getElementById('title').value;
+            const artist = document.getElementById('artist').value;
+            const downloadCode = document.getElementById('download-code-input').value;
+            const adminCode = document.getElementById('admin-code').value;
+            
+            console.log('Form values:', { title, artist, downloadCode, adminCode });
+
+            if (!fileInput.files.length) {
+                showError('Please select an audio file');
+                return;
+            }
+            
+            console.log('File selected:', fileInput.files[0].name);
+
+            const formData = new FormData();
+            formData.append('title', title);
+            formData.append('artist', artist);
+            formData.append('download_code', downloadCode);
+            formData.append('admin_code', adminCode);
+            formData.append('files', fileInput.files[0]);
+
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Uploading...';
+
+            try {
+                const progressDiv = document.getElementById('progress');
+                progressDiv.classList.add('show');
+
+                const xhr = new XMLHttpRequest();
+
+                xhr.upload.addEventListener('progress', (e) => {
+                    if (e.lengthComputable) {
+                        const percent = Math.round((e.loaded / e.total) * 100);
+                        document.getElementById('progress-fill').style.width = percent + '%';
+                        document.getElementById('progress-percent').textContent = percent + '%';
+                    }
+                });
+
+                xhr.addEventListener('load', () => {
+                    console.log('XHR Load event. Status:', xhr.status);
+                    console.log('Response text:', xhr.responseText);
+                    
+                    if (xhr.status === 200) {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            if (response.success) {
+                                progressDiv.classList.remove('show');
+                                document.getElementById('share-link').textContent = response.fullLink;
+                                document.getElementById('download-code').textContent = downloadCode;
+                                successDiv.classList.add('show');
+                                form.reset();
+                                fileName.classList.remove('show');
+                            } else {
+                                showError(response.error || 'Upload failed');
+                            }
+                        } catch (parseError) {
+                            showError('Response parsing error: ' + parseError.message);
+                        }
+                    } else {
+                        try {
+                            const response = JSON.parse(xhr.responseText);
+                            showError(response.error || `Upload failed (${xhr.status})`);
+                        } catch (parseError) {
+                            showError(`Upload failed with status ${xhr.status}`);
+                        }
+                    }
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Upload Track';
+                });
+
+                xhr.addEventListener('error', (e) => {
+                    console.error('XHR Error:', e);
+                    showError('Upload failed. Please check your connection.');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Upload Track';
+                });
+
+                xhr.open('POST', 'https://bhoomi-mixing-backend-production.up.railway.app/api/admin/upload-delivery');
+                xhr.send(formData);
+
+            } catch (error) {
+                showError(error.message);
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Upload Track';
+            }
+        });
+
+        function showError(message) {
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function copyToClipboard() {
+            const text = document.getElementById('share-link').textContent;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Link copied to clipboard!');
+            });
+        }
+    </script>
+</body>
+</html>
